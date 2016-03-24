@@ -663,13 +663,15 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         ui_bar.right.append(ui_bar.loader);
         ui_bar.result_indicator = $('<a id="eexcess_result_indicator" href="#">16 results</a>').click(function(e) {
             window.parent.postMessage({event: 'eexcess.searchBarhei',data:ui_bar.bar[0].clientHeight},'*');
-            e.preventDefault();
+            //e.preventDefault();
             util.hidePopup();
             //ui_bar.window_controls.show();
             // TODO: handle error indications (i.e. no results are obtained from server e.g.)
             window.parent.postMessage({event: 'eexcess.openResultsBar',data:""},'*');
             iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: lastQuery});
             iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
+            //console.log('lastquery',lastQuery);
+            //console.log('results',results);
             if (!ui_content.contentArea.is(':visible')) {
                 ui_content.contentArea.show('fast');
                 /*if (settings.queryCrumbs.active) {
@@ -956,7 +958,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             util.addRemoveOverflow(ui_bar.bar[0].clientHeight);
             //console.log('second',ui_bar.bar[0].clientHeight)
             window.parent.postMessage({event: 'eexcess.searchBarhei',data:ui_bar.bar[0].clientHeight},'*');
-            //console.log('lastquery',lastQuery.contextKeywords[0])
+            //console.log('lastquery',lastQuery)
             iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: msg.data.data});
             ui_bar.result_indicator.hide();
             util.hidePopup();
@@ -965,7 +967,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 
                 if (response.status === 'success') {
                     results = response.data;
-                    //console.log('results',results.profile.contextKeywords[0])
+                    
                     ui_bar.loader.hide();
                     ui_bar.result_indicator.text(response.data.totalResults + ' results');
                     ui_bar.result_indicator.show();
@@ -987,7 +989,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
                 }
             });
         } else if(msg.data.event && msg.data.event === 'eexcess.closeResultsAfterCitation'){
-            $("#eexcess_close").trigger('click')
+            //$("#eexcess_close").trigger('click')
         } else if(msg.data.event === 'attoEditorOpened'){
             //window.console.log('sb - attoEditorOpened');
             iframes.sendMsgAll({event:'attoEditorOpened',data:''})
@@ -1006,9 +1008,25 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             window.parent.postMessage({event:'eexcess.screenshot',data:msg.data.data}, '*');
             $("#eexcess_close").trigger('click');
         } else if(msg.data.event === 'eexcess.linkItemClicked'){
+            //console.log('adasdas',msg.data.data.facets.year)
             window.parent.postMessage({event:'eexcess.linkItemClicked', data: msg.data.data}, '*');
             $("#eexcess_close").trigger('click');
         } else if(msg.data.event === 'eexcess.linkImageClicked'){
+            //console.log(msg.data.data.id)
+            //console.log(results.result);
+            //console.log('adasdas',msg.data.data)
+            if(msg.data.data.facets.license === undefined){
+                for(var i = 0; i<results.result.length; i++){
+                    if(results.result[i].documentBadge.id === msg.data.data.id){
+                        msg.data.data.facets.license = results.result[i].licence;
+                        //console.log(results.result[i].licence);
+                    }
+                }
+
+            }
+            else{
+                //console.log('have license');
+            }
             window.parent.postMessage({event:'eexcess.linkImageClicked', data: msg.data.data}, '*');
             $("#eexcess_close").trigger('click');
         } 
