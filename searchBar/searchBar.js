@@ -670,6 +670,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             window.parent.postMessage({event: 'eexcess.openResultsBar',data:""},'*');
             iframes.sendMsgAll({event: 'eexcess.queryTriggered', data: lastQuery});
             iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
+            //console.log('clicked data = ', results);
             //console.log('lastquery',lastQuery);
             //console.log('results',results);
             if (!ui_content.contentArea.is(':visible')) {
@@ -934,7 +935,7 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
     var tabModel = {
         tabs: []
     };
-    
+    var attoEditor = false;
     var crumbClicked = false;
     window.onmessage = function(msg) {
         // visualization has triggered a query -> widgets must be visible
@@ -991,6 +992,8 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
         } else if(msg.data.event && msg.data.event === 'eexcess.closeResultsAfterCitation'){
             //$("#eexcess_close").trigger('click')
         } else if(msg.data.event === 'attoEditorOpened'){
+            attoEditor = true;
+            //console.log(attoEditor);
             //window.console.log('sb - attoEditorOpened');
             iframes.sendMsgAll({event:'attoEditorOpened',data:''})
             
@@ -1029,7 +1032,13 @@ define(['jquery', 'jquery-ui', 'tag-it', 'c4/APIconnector', 'c4/iframes', 'c4/Qu
             }
             window.parent.postMessage({event:'eexcess.linkImageClicked', data: msg.data.data}, '*');
             $("#eexcess_close").trigger('click');
-        } 
+        } else if(msg.data.event === 'facetScapeOpened'){
+            window.parent.postMessage({event:'facetScapeOpened',data:""},'*');
+            if(attoEditor === true){
+                iframes.sendMsgAll({event:'attoEditorOpened',data:""});
+            }
+            iframes.sendMsgAll({event: 'eexcess.newResults', data: results});
+        }
         
         // TODO: handle other events?
     };
